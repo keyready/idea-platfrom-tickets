@@ -19,7 +19,9 @@ export const Navbar = (props: NavbarProps) => {
             justify="between"
             gap="64px"
         >
-            <AppLink to={RoutePath.main}>FSD App</AppLink>
+            <AppLink className="text-l" to={RoutePath.main}>
+                IDEA Platform's Tickets Shop
+            </AppLink>
             <h1>created by keyready</h1>
         </HStack>
     );

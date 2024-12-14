@@ -7,7 +7,17 @@ const TicketsApi = rtkApi.injectEndpoints({
     endpoints: (build) => ({
         getTickets: build.query<Ticket[], Filters>({
             query: (filters) => {
-                const { currency, price, stops } = filters;
+                const { currency, price, destination, origin, stops } = filters;
+
+                let baseUrl = '/api/tickets?_sort=price,stops';
+
+                if (destination && destination !== 'ANY') {
+                    baseUrl += `&destination=${destination}`;
+                }
+
+                if (origin && origin !== 'ANY') {
+                    baseUrl += `&origin=${origin}`;
+                }
 
                 if (price?.length) {
                     const localPrice: number[] = [price[0], price[1]];
@@ -20,17 +30,15 @@ const TicketsApi = rtkApi.injectEndpoints({
                         localPrice[1] = price[1] * 103;
                     }
 
-                    return {
-                        url: `/api/tickets?_sort=price,stops&price_gte=${localPrice[0]}&price_lte=${
-                            localPrice[1]
-                        }${stops === 'all' ? '' : `&stops=${stops}`}`,
-                    };
+                    baseUrl += `&price_gte=${localPrice[0]}&price_lte=${localPrice[1]}${
+                        stops === 'all' ? '' : `&stops=${stops}`
+                    }`;
+                } else {
+                    baseUrl += `${stops === 'all' ? '' : `&stops=${stops}`}`;
                 }
 
                 return {
-                    url: `/api/tickets?_sort=price,stops${
-                        stops === 'all' ? '' : `&stops=${stops}`
-                    }`,
+                    url: baseUrl,
                 };
             },
         }),

@@ -4,10 +4,9 @@ import { RiEmotionSadLine } from '@remixicon/react';
 import { useTickets } from '../../api/TicketsApi';
 import { TicketCard } from '../TicketCard/Ticket';
 
-import { FiltersBlock } from '@/entities/Filters/ui/FiltersBlock/FiltersBlock';
+import { FiltersBlock, getFiltersData } from '@/entities/Filters';
 import { classNames } from '@/shared/lib/classNames';
 import { HStack, VStack } from '@/shared/ui/Stack';
-import { getFiltersData } from '@/entities/Filters';
 import { Skeleton } from '@/shared/ui/Skeleton';
 
 interface TicketsListProps {

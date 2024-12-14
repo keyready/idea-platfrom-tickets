@@ -55,8 +55,10 @@
         "vite-plugin-svgr": "^4.2.0"
     },
     "dependencies": {
+        "@internationalized/date": "^3.6.0",
         "@marsidev/react-turnstile": "^1.0.2",
         "@nextui-org/react": "^2.4.6",
+        "@react-aria/i18n": "^3.12.2",
         "@reduxjs/toolkit": "^1.8.0",
         "@remixicon/react": "^4.2.0",
         "axios": "1.6.0",

@@ -7,13 +7,11 @@ import {
 } from '@reduxjs/toolkit';
 import { AxiosInstance } from 'axios';
 
-import { UserSchema } from '@/entities/User';
 import { rtkApi } from '@/shared/api/rtkApi';
 import { TicketSchema } from '@/entities/Ticket';
 import { FiltersSchema } from '@/entities/Filters';
 
 export interface StateSchema {
-    user: UserSchema;
     filters: FiltersSchema;
     [rtkApi.reducerPath]: ReturnType<typeof rtkApi.reducer>;
 

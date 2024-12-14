@@ -8,3 +8,5 @@ export {
     getFiltersError,
     getFilteredCurrency,
 } from './model/selectors/FiltersSelectors';
+
+export { FiltersBlock } from './ui/FiltersBlock/FiltersBlock';

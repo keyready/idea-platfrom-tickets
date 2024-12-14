@@ -2,11 +2,9 @@ import { RouteProps } from 'react-router-dom';
 
 import { MainPage } from '@/pages/MainPage';
 import { NotFound } from '@/pages/NotFound';
-import { UserRoles } from '@/entities/User';
 
 export type AppRoutesProps = RouteProps & {
     authOnly?: boolean;
-    roles?: UserRoles[];
 };
 
 export enum AppRoutes {
@@ -24,7 +22,6 @@ export const RoutePath: Record<AppRoutes, string> = {
 };
 
 export const routerConfig: Record<AppRoutes, AppRoutesProps> = {
-    // авторизация
     [AppRoutes.MAIN]: {
         path: RoutePath.main,
         element: <MainPage />,
