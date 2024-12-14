@@ -8,11 +8,30 @@ import { HStack, VStack } from '@/shared/ui/Stack';
 
 interface TicketCardProps {
     className?: string;
+    currency?: string;
     ticket: Ticket;
 }
 
 export const TicketCard = memo((props: TicketCardProps) => {
-    const { className, ticket } = props;
+    const { className, currency, ticket } = props;
+
+    const convertCurrency = useCallback(
+        (rubCurrency: number) => {
+            // конвертация по курсу $1 = 103 руб, 1 eur = 109 руб
+
+            console.log(currency);
+
+            switch (currency) {
+                case 'USD':
+                    return rubCurrency / 103;
+                case 'EUR':
+                    return rubCurrency / 109;
+                default:
+                    return rubCurrency;
+            }
+        },
+        [currency],
+    );
 
     const normalizeCountForm = useCallback((number: number, words_arr: string[]) => {
         number = Math.abs(number);
@@ -44,7 +63,9 @@ export const TicketCard = memo((props: TicketCardProps) => {
                 <Button color="secondary" className="py-8 px-10 rounded-sm">
                     <VStack align="center">
                         <p>Купить</p>
-                        <p className="text-l block">за {ticket.price.toLocaleString('ru-RU')} ₽</p>
+                        <p className="text-l block">
+                            за {convertCurrency(ticket.price).toLocaleString('ru-RU')} ₽
+                        </p>
                     </VStack>
                 </Button>
             </VStack>

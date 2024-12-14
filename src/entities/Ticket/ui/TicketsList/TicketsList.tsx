@@ -1,8 +1,13 @@
+import { useEffect, useState } from 'react';
+
 import { useTickets } from '../../api/TicketsApi';
+import { Filters } from '../../model/types/Ticket';
+import { TicketCard } from '../TicketCard/Ticket';
+import { FiltersBlock } from '../FiltersBlock/FiltersBlock';
 
 import { classNames } from '@/shared/lib/classNames';
-import { TicketCard } from '@/entities/Ticket/ui/TicketCard/Ticket';
-import { VStack } from '@/shared/ui/Stack';
+import { HStack, VStack } from '@/shared/ui/Stack';
+import { useParams } from '@/shared/lib/hooks/useParams';
 
 interface TicketsListProps {
     className?: string;
@@ -11,7 +16,38 @@ interface TicketsListProps {
 export const TicketsList = (props: TicketsListProps) => {
     const { className } = props;
 
-    const { data: tickets, isLoading: isTicketsLoading } = useTickets();
+    const [filter, setFilter] = useState<Filters>({
+        price: [0, 50000],
+        stops: 'all',
+        currency: 'RUB',
+    });
+
+    const { data: tickets, isLoading: isTicketsLoading } = useTickets(filter);
+
+    const { getParamValue } = useParams();
+
+    useEffect(() => {
+        const currency = getParamValue('currency');
+        const stops = getParamValue('stops');
+        const price = getParamValue('price');
+
+        console.log(currency, stops, price);
+
+        if (currency) {
+            setFilter((prevState) => ({ ...prevState, currency: currency.toString() }));
+        }
+        if (stops) {
+            setFilter((prevState) => ({ ...prevState, stops: stops.toString() }));
+        }
+        if (price) {
+            const priceRange = price
+                .toString()
+                .split(',')
+                .map((pr) => Number(pr));
+
+            setFilter((prevState) => ({ ...prevState, price: priceRange }));
+        }
+    }, []);
 
     if (isTicketsLoading) {
         return (
@@ -30,10 +66,13 @@ export const TicketsList = (props: TicketsListProps) => {
     }
 
     return (
-        <VStack maxW gap="24px" className={classNames('', {}, [className])}>
-            {tickets?.map((ticket) => (
-                <TicketCard key={ticket.id} ticket={ticket} />
-            ))}
-        </VStack>
+        <HStack gap="24px" maxW className="relative" align="start">
+            <FiltersBlock />
+            <VStack maxW gap="24px" className={classNames('', {}, [className])}>
+                {tickets?.map((ticket) => (
+                    <TicketCard currency={filter.currency} key={ticket.id} ticket={ticket} />
+                ))}
+            </VStack>
+        </HStack>
     );
 };

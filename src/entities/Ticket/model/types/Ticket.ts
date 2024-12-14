@@ -15,3 +15,9 @@ export interface Ticket {
     stops: number;
     price: number;
 }
+
+export interface Filters {
+    price: number[];
+    currency: string;
+    stops: string;
+}

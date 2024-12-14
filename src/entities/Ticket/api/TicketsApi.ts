@@ -1,12 +1,17 @@
+import { Filters, Ticket } from '../model/types/Ticket';
+
 import { rtkApi } from '@/shared/api/rtkApi';
-import { Ticket } from '@/entities/Ticket';
 
 const TicketsApi = rtkApi.injectEndpoints({
     endpoints: (build) => ({
-        getTickets: build.query<Ticket[], void>({
-            query: () => ({
-                url: `/api/tickets`,
-            }),
+        getTickets: build.query<Ticket[], Filters>({
+            query: (filters) => {
+                const { price, stops } = filters;
+
+                return {
+                    url: `/api/tickets?stops_get=${stops}`,
+                };
+            },
         }),
     }),
 });
