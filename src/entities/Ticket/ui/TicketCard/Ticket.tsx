@@ -1,33 +1,34 @@
 import { memo, useCallback } from 'react';
 import { Button, Image } from '@nextui-org/react';
 import { RiPlaneFill } from '@remixicon/react';
+import { useSelector } from 'react-redux';
 
 import { classNames } from '@/shared/lib/classNames';
 import { Ticket } from '@/entities/Ticket';
 import { HStack, VStack } from '@/shared/ui/Stack';
+import { getFilteredCurrency } from '@/entities/Filters';
 
 interface TicketCardProps {
     className?: string;
-    currency?: string;
     ticket: Ticket;
 }
 
 export const TicketCard = memo((props: TicketCardProps) => {
-    const { className, currency, ticket } = props;
+    const { className, ticket } = props;
+
+    const currency = useSelector(getFilteredCurrency);
 
     const convertCurrency = useCallback(
         (rubCurrency: number) => {
             // конвертация по курсу $1 = 103 руб, 1 eur = 109 руб
 
-            console.log(currency);
-
             switch (currency) {
                 case 'USD':
-                    return rubCurrency / 103;
+                    return `$${(rubCurrency / 103).toFixed(2)}`;
                 case 'EUR':
-                    return rubCurrency / 109;
+                    return `€${(rubCurrency / 109).toFixed(2)}`;
                 default:
-                    return rubCurrency;
+                    return `${rubCurrency.toLocaleString('ru-RU')}₽`;
             }
         },
         [currency],
@@ -63,9 +64,7 @@ export const TicketCard = memo((props: TicketCardProps) => {
                 <Button color="secondary" className="py-8 px-10 rounded-sm">
                     <VStack align="center">
                         <p>Купить</p>
-                        <p className="text-l block">
-                            за {convertCurrency(ticket.price).toLocaleString('ru-RU')} ₽
-                        </p>
+                        <p className="text-l block">за {convertCurrency(ticket.price)}</p>
                     </VStack>
                 </Button>
             </VStack>

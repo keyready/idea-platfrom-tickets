@@ -12,16 +12,15 @@ export const Skeleton = (props: SkeletonProps) => {
 
     return (
         <ContentLoader
-            speed={2}
+            speed={1}
             width={width}
             height={height}
             viewBox={`0 0 ${width} ${height}`}
-            backgroundColor="#808080"
-            foregroundColor="#444"
+            backgroundColor="#d0d0d0"
+            foregroundColor="#fff"
             className={className}
         >
-            <rect x="0" y="0" rx={rounded} ry={rounded} width="100%"
-height="100%" />
+            <rect x="0" y="0" rx={rounded} ry={rounded} width="100%" height="100%" />
         </ContentLoader>
     );
 };

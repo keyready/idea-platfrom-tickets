@@ -1,11 +1,13 @@
 import { Button, ButtonGroup, Radio, RadioGroup, Slider } from '@nextui-org/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { Currency } from '../../model/types/Filters';
 
 import { classNames } from '@/shared/lib/classNames';
 import { VStack } from '@/shared/ui/Stack';
 import { useParams } from '@/shared/lib/hooks/useParams';
-
-type Currency = 'RUB' | 'EUR' | 'USD';
+import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch';
+import { FiltersActions } from '@/entities/Filters';
 
 interface FiltersBlockProps {
     className?: string;
@@ -16,7 +18,9 @@ export const FiltersBlock = (props: FiltersBlockProps) => {
 
     const [selectedCurrency, setSelectedCurrency] = useState<Currency>('RUB');
     const [selectedStopsCount, setSelectedStopsCount] = useState<string>('all');
-    const [selectedAmountRange, setSelectedAmountRange] = useState<number[]>([0, 50000]);
+    const [selectedAmountRange, setSelectedAmountRange] = useState<number[]>([0, 35000]);
+
+    const dispatch = useAppDispatch();
 
     const { setParams, getParamValue, getParams } = useParams();
 
@@ -46,7 +50,36 @@ export const FiltersBlock = (props: FiltersBlockProps) => {
             currency: selectedCurrency,
             price: `${selectedAmountRange[0].toString()},${selectedAmountRange[1].toString()}`,
         });
-    }, [selectedCurrency, selectedStopsCount, selectedAmountRange]);
+
+        dispatch(FiltersActions.setFilters({ currency: selectedCurrency as Currency }));
+        dispatch(FiltersActions.setFilters({ stops: selectedStopsCount.toString() }));
+        dispatch(FiltersActions.setFilters({ price: selectedAmountRange }));
+    }, [selectedCurrency, selectedStopsCount, selectedAmountRange, dispatch]);
+
+    const handleDisableFilters = useCallback(() => {
+        dispatch(
+            FiltersActions.setFilters({
+                price: [0, 35000],
+                stops: 'all',
+                currency: 'RUB',
+            }),
+        );
+        setSelectedCurrency('RUB');
+        setSelectedStopsCount('all');
+        setSelectedAmountRange([0, 35000]);
+        setParams({});
+    }, [dispatch]);
+
+    const getUpperCurrencyPrice = useMemo(() => {
+        switch (selectedCurrency) {
+            case 'USD':
+                return 35000 / 103;
+            case 'EUR':
+                return 35000 / 109;
+            default:
+                return 35000;
+        }
+    }, [selectedCurrency]);
 
     return (
         <VStack
@@ -115,17 +148,19 @@ export const FiltersBlock = (props: FiltersBlockProps) => {
                     }}
                     color="secondary"
                     showTooltip
-                    defaultValue={[0, 50000]}
+                    defaultValue={[0, 35000]}
                     formatOptions={{
                         style: 'currency',
                         currency: selectedCurrency,
                         maximumSignificantDigits: 3,
                     }}
-                    maxValue={50000}
+                    maxValue={getUpperCurrencyPrice}
                     minValue={0}
-                    step={1000}
                 />
             </VStack>
+            <Button onClick={handleDisableFilters} className="self-end" size="sm" color="danger">
+                <h1 className="text-m uppercase">сбросить</h1>
+            </Button>
         </VStack>
     );
 };

@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RiEmotionSadLine } from '@remixicon/react';
 
 import { useTickets } from '../../api/TicketsApi';
-import { Filters } from '../../model/types/Ticket';
 import { TicketCard } from '../TicketCard/Ticket';
-import { FiltersBlock } from '../FiltersBlock/FiltersBlock';
 
+import { FiltersBlock } from '@/entities/Filters/ui/FiltersBlock/FiltersBlock';
 import { classNames } from '@/shared/lib/classNames';
 import { HStack, VStack } from '@/shared/ui/Stack';
-import { useParams } from '@/shared/lib/hooks/useParams';
+import { getFiltersData } from '@/entities/Filters';
+import { Skeleton } from '@/shared/ui/Skeleton';
 
 interface TicketsListProps {
     className?: string;
@@ -16,52 +17,40 @@ interface TicketsListProps {
 export const TicketsList = (props: TicketsListProps) => {
     const { className } = props;
 
-    const [filter, setFilter] = useState<Filters>({
-        price: [0, 50000],
-        stops: 'all',
-        currency: 'RUB',
-    });
+    const filters = useSelector(getFiltersData);
 
-    const { data: tickets, isLoading: isTicketsLoading } = useTickets(filter);
+    const {
+        data: tickets,
+        isLoading: isTicketsLoading,
+        isFetching: isTicketsFetching,
+    } = useTickets(filters);
 
-    const { getParamValue } = useParams();
-
-    useEffect(() => {
-        const currency = getParamValue('currency');
-        const stops = getParamValue('stops');
-        const price = getParamValue('price');
-
-        console.log(currency, stops, price);
-
-        if (currency) {
-            setFilter((prevState) => ({ ...prevState, currency: currency.toString() }));
-        }
-        if (stops) {
-            setFilter((prevState) => ({ ...prevState, stops: stops.toString() }));
-        }
-        if (price) {
-            const priceRange = price
-                .toString()
-                .split(',')
-                .map((pr) => Number(pr));
-
-            setFilter((prevState) => ({ ...prevState, price: priceRange }));
-        }
-    }, []);
-
-    if (isTicketsLoading) {
+    if (isTicketsLoading || isTicketsFetching) {
         return (
-            <div>
-                <h1>Загрузка данных....</h1>
-            </div>
+            <HStack gap="24px" maxW className="relative" align="start">
+                <FiltersBlock />
+                <VStack maxW gap="24px">
+                    {new Array(5).fill(0).map(() => (
+                        <Skeleton width="100%" height={225} />
+                    ))}
+                </VStack>
+            </HStack>
         );
     }
 
-    if (!tickets && !isTicketsLoading) {
+    if (!tickets?.length && !isTicketsLoading) {
         return (
-            <div>
-                <h1>Упс... Билетов не найдено</h1>
-            </div>
+            <HStack gap="24px" maxW className="relative" align="start">
+                <FiltersBlock />
+                <VStack gap="24px" className="h-full" justify="center" align="center" maxW flexGrow>
+                    <h1 className="text-white text-nowrap text-center text-3xl">
+                        Упс... Билетов не найдено <RiEmotionSadLine className="inline" size={64} />
+                    </h1>
+                    <h2 className="text-white text-nowrap text-center text-xl">
+                        Попробуйте изменить параметры поиска
+                    </h2>
+                </VStack>
+            </HStack>
         );
     }
 
@@ -70,7 +59,7 @@ export const TicketsList = (props: TicketsListProps) => {
             <FiltersBlock />
             <VStack maxW gap="24px" className={classNames('', {}, [className])}>
                 {tickets?.map((ticket) => (
-                    <TicketCard currency={filter.currency} key={ticket.id} ticket={ticket} />
+                    <TicketCard key={ticket.id} ticket={ticket} />
                 ))}
             </VStack>
         </HStack>
